@@ -1,0 +1,23 @@
+<ion-header>
+    <ion-navbar color="secondary">
+        <ion-title>
+            Todos!
+        </ion-title>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="addItem()"><ion-icon name="add-circle"></ion-icon></button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+
+<ion-content>
+    <ion-list>
+        <ion-item *ngFor="let item of trips" (click)="viewItem(item)">
+            {{item.title}}
+            <div class="{{item.isSelected?'trip-description-list-visible':'trip-description-list-hidden'}}">
+                <span>{{item.description}}
+                    <button ion-button (click)="navToTrip(item)">view</button>
+                </span>
+            </div>
+        </ion-item>
+    </ion-list>
+</ion-content>
