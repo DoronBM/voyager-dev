@@ -1,4 +1,5 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Camera } from 'ionic-native';
 import { NavController, NavParams } from 'ionic-angular';
 import { TripsRepository, Trip } from '../../providers/trips-repository';
 
@@ -14,7 +15,7 @@ declare var google;
   templateUrl: 'trip.html'
 })
 export class TripPage {
-
+    private base64Image;
     private trip: Trip;
     @ViewChild('map') mapElement: ElementRef;
     map: any;
@@ -29,7 +30,7 @@ export class TripPage {
 
   loadMap():void  {
 
-      let latLng = new google.maps.LatLng(-34.9290, 138.6010);
+      let latLng = new google.maps.LatLng(32.7391, 35.2419);
 
       let mapOptions = {
           center: latLng,
@@ -41,12 +42,37 @@ export class TripPage {
 
   }
 
-  addMarker() {
+private addImage(): void {
+    Camera.getPicture({
+        sourceType: Camera.PictureSourceType.SAVEDPHOTOALBUM,
+        destinationType: Camera.DestinationType.DATA_URL
+    }).then((imageData) => {
+        this.base64Image = 'data:image/jpeg;base64,' + imageData;
+        //this.base64Image = imageURL;
+        //console.log("url:" + base64Image);
+        this.addMarker();
+    }, (err) => {
+        console.log(err);
+    });
+}
+
+  private addMarker() {
+
+      let mImage = {
+          url: this.base64Image,
+          // This marker is 20 pixels wide by 32 pixels high.
+          // The origin for this image is (0, 0).
+          origin: new google.maps.Point(0, 0),
+          // The anchor for this image is the base of the flagpole at (0, 32).
+          anchor: new google.maps.Point(0, 32),
+          scaledSize: new google.maps.Size(25,32)
+      };
 
       let marker = new google.maps.Marker({
           map: this.map,
           animation: google.maps.Animation.DROP,
-          position: this.map.getCenter()
+          position: this.map.getCenter(),
+          icon: mImage
       });
 
       let content = "<h4>Information!</h4>";
