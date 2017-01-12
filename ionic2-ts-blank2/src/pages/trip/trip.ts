@@ -1,9 +1,10 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
-import { Camera } from 'ionic-native';
+import { Camera, ImagePicker } from 'ionic-native';
 import { NavController, NavParams } from 'ionic-angular';
 import { TripsRepository, Trip } from '../../providers/trips-repository';
 
 declare var google;
+
 /*
   Generated class for the Trip page.
 
@@ -11,17 +12,23 @@ declare var google;
   Ionic pages and navigation.
 */
 @Component({
-  selector: 'page-trip',
-  templateUrl: 'trip.html'
+    selector: 'page-trip',
+    templateUrl: 'trip.html'
 })
+
+
+
+
 export class TripPage {
     private base64Image;
     private trip: Trip;
+    private image;
     @ViewChild('map') mapElement: ElementRef;
     map: any;
 
     constructor(public navCtrl: NavController, public navParams: NavParams) {
         this.trip = navParams.get('trip');
+        
     }
 
   ionViewDidLoad() {
@@ -42,18 +49,46 @@ export class TripPage {
 
   }
 
+
 private addImage(): void {
-    Camera.getPicture({
-        sourceType: Camera.PictureSourceType.SAVEDPHOTOALBUM,
-        destinationType: Camera.DestinationType.DATA_URL
-    }).then((imageData) => {
-        this.base64Image = 'data:image/jpeg;base64,' + imageData;
-        //this.base64Image = imageURL;
-        //console.log("url:" + base64Image);
+    //Camera.getPicture({
+    //    sourceType: Camera.PictureSourceType.SAVEDPHOTOALBUM,
+    //    destinationType: Camera.DestinationType.DATA_URL
+    //}).then((imageData) => {
+    //    this.base64Image = 'data:image/jpeg;base64,' + imageData;
+    //    //this.base64Image = imageURL;
+    //    //console.log("url:" + base64Image);
+    //    this.addMarker();
+    //}, (err) => {
+    //    console.log(err);
+    //});
+
+    let options = {
+        maximumImagesCount: 8,
+        width: 500,
+        height: 500,
+        quality: 75
+    };
+
+    var that = this;
+
+    ImagePicker.getPictures(options).then((results) => {
+        for (var i = 0; i < results.length; i++) {
+            var imageUrl = results[i];
+            this.image = imageUrl;
+            var name = imageUrl.substr(imageUrl.lastIndexOf('/') + 1);
+            var namePath = imageUrl.substr(0, imageUrl.lastIndexOf('/') + 1);
+            this.base64Image = imageUrl;
+            this.addMarker();
+        };
+
+
+    }, (err) => { });
+}
+
+    setImage(data): void {
+        this.base64Image = 'data:image/jpeg;base64,' + data;
         this.addMarker();
-    }, (err) => {
-        console.log(err);
-    });
 }
 
   private addMarker() {
